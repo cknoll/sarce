@@ -68,7 +68,7 @@ class ComEx(object):
     def deactivate_venv(self):
         self.venv = None
 
-    def run(self, cmd, use_dir=True, hide=False, warn=False, printonly=False, use_venv=True):
+    def run(self, cmd, use_dir=True, hide=True, warn=False, printonly=False, use_venv=True):
         """
 
         :param cmd:

@@ -92,3 +92,10 @@ class ComEx(object):
             res = None
         return res
 
+    def get_stdout(self, cmd, **kwargs):
+        res = self.run(cmd, **kwargs)
+        if hasattr(res, "stdout"):
+            return res.stdout.strip()
+        else:
+            return res
+

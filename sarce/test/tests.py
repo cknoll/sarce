@@ -25,6 +25,9 @@ class GeneralTests(TestCase):
         res = ce.run("whoami", hide=True)
         self.assertEqual(res.stdout.strip(), user)
 
+        un = ce.get_stdout("whoami")
+        self.assertEqual(un, user)
+
     def test_chdir(self):
         ce = sarce.ComEx(remote, user)
         res1 = ce.run("ls")

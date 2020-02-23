@@ -1,6 +1,7 @@
 from unittest import TestCase
 import os
 
+from ipydex import IPS
 import sarce
 
 """
@@ -28,6 +29,18 @@ class GeneralTests(TestCase):
         un = ce.get_stdout("whoami")
         self.assertEqual(un, user)
 
+    def test_simple_command_err(self):
+        ce = sarce.ComEx(remote, user)
+
+        with self.assertRaises(sarce.core.RemoteExecutionError) as cm:
+            ce.run("foobarbaz")
+
+        with self.assertRaises(sarce.core.RemoteExecutionError) as cm:
+            ce.get_stdout("foobarbaz")
+
+        with self.assertRaises(sarce.core.RemoteExecutionError) as cm:
+            ce.get_stdout("rm foobarbaz")
+
     def test_chdir(self):
         ce = sarce.ComEx(remote, user)
         res1 = ce.run("ls")
@@ -36,6 +49,11 @@ class GeneralTests(TestCase):
         res3 = ce.run("ls")
         self.assertNotEqual(res1.stdout, res2.stdout)
         self.assertEqual(res2.stdout, res3.stdout)
+
+    def test_chdir_err(self):
+        ce = sarce.ComEx(remote, user)
+        with self.assertRaises(sarce.core.RemoteExecutionError) as cm:
+            ce.chdir("foobarbaz")
 
     def test_venv(self):
         ce = sarce.ComEx(remote, user)
@@ -57,3 +75,8 @@ class GeneralTests(TestCase):
         self.assertFalse(test_env_path_base in res1.stdout)
         self.assertTrue(test_env_path_base in res2.stdout)
         self.assertFalse(test_env_path_base in res3.stdout)
+
+    def test_venv_err(self):
+        ce = sarce.ComEx(remote, user)
+        with self.assertRaises(sarce.core.RemoteExecutionError) as cm:
+            ce.activate_venv("foobarbaz")

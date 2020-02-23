@@ -22,7 +22,7 @@ test_env_path = os.path.expanduser("~/z_local_data/venvs/sarca_test_env/bin/acti
 class GeneralTestsRemote(TestCase):
 
     def test_simple_command(self):
-        ce = sarce.RemComEx(remote, user)
+        ce = sarce.ReComEx(remote, user)
         res = ce.run("whoami", hide=True)
         self.assertEqual(res.stdout.strip(), user)
 
@@ -30,7 +30,7 @@ class GeneralTestsRemote(TestCase):
         self.assertEqual(un, user)
 
     def test_simple_command_err(self):
-        ce = sarce.RemComEx(remote, user)
+        ce = sarce.ReComEx(remote, user)
 
         with self.assertRaises(sarce.core.RemoteExecutionError) as cm:
             ce.run("foobarbaz")
@@ -42,7 +42,7 @@ class GeneralTestsRemote(TestCase):
             ce.get_stdout("rm foobarbaz")
 
     def test_chdir(self):
-        ce = sarce.RemComEx(remote, user)
+        ce = sarce.ReComEx(remote, user)
         res1 = ce.run("ls")
         ce.chdir("tmp")
         res2 = ce.run("ls")
@@ -51,12 +51,12 @@ class GeneralTestsRemote(TestCase):
         self.assertEqual(res2.stdout, res3.stdout)
 
     def test_chdir_err(self):
-        ce = sarce.RemComEx(remote, user)
+        ce = sarce.ReComEx(remote, user)
         with self.assertRaises(sarce.core.RemoteExecutionError) as cm:
             ce.chdir("foobarbaz")
 
     def test_venv(self):
-        ce = sarce.RemComEx(remote, user)
+        ce = sarce.ReComEx(remote, user)
 
         test_env_path_base = test_env_path.replace("/bin/activate", "")
 
@@ -77,9 +77,10 @@ class GeneralTestsRemote(TestCase):
         self.assertFalse(test_env_path_base in res3.stdout)
 
     def test_venv_err(self):
-        ce = sarce.RemComEx(remote, user)
+        ce = sarce.ReComEx(remote, user)
         with self.assertRaises(sarce.core.RemoteExecutionError) as cm:
             ce.activate_venv("foobarbaz")
+
 
 class GeneralTestsLocal(TestCase):
 

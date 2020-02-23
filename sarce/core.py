@@ -11,11 +11,12 @@ class RemoteExecutionError(Exception):
 class LocalExecutionError(Exception):
     pass
 
+
 class Container(object):
     pass
 
 
-class RemComEx(object):
+class ReComEx(object):
     """
     Remote Command Executor. Wrapper class for fabric connection which remembers the working directory and other states
     """

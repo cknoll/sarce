@@ -1,2 +1,2 @@
 from .release import __version__
-from .core import RemComEx, LoComEx
+from .core import ReComEx, LoComEx

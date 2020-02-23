@@ -1,4 +1,5 @@
 import os
+import subprocess
 from fabric import Connection
 from invoke.exceptions import UnexpectedExit
 
@@ -7,9 +8,16 @@ class RemoteExecutionError(Exception):
     pass
 
 
-class ComEx(object):
+class LocalExecutionError(Exception):
+    pass
+
+class Container(object):
+    pass
+
+
+class RemComEx(object):
     """
-    Command Executor. Wrapper class for fabric connection which remembers the working directory and other states
+    Remote Command Executor. Wrapper class for fabric connection which remembers the working directory and other states
     """
 
     def __init__(self, remote, user, strict=True):
@@ -138,3 +146,59 @@ class ComEx(object):
         else:
             return res
 
+
+class LoComEx(object):
+    """
+    Local Command Executor. Basically a wrapper around os.system(cmd).
+    """
+
+    def __init__(self, strict=True):
+        """
+
+        :param strict:  raise an exception if something goes wrong
+        """
+
+        self.strict = strict
+
+        self.hide = True  # hide mode for commands which are called implicitly
+
+    def run(self, cmd, strict=None):
+        """
+
+        :param cmd:
+        :param strict:      strict mode (None -> use self.strict)
+        :return:
+        """
+
+        if strict is None:
+            strict = self.strict
+
+        # res = os.system(cmd)
+        try:
+            stdout, return_code = subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True), 0
+
+        except subprocess.CalledProcessError as e:
+
+            return_code = e.args[0]
+            stdout = str(e)
+            errmsg = "Error: {}. Cmd was:\n {}".format(str(e), cmd)
+        else:
+            errmsg = ""
+
+        if return_code != 0:
+            if strict:
+                raise LocalExecutionError(errmsg)
+            else:
+                print(errmsg)
+
+        res = Container()
+        res.exited = return_code
+        res.stdout = stdout.decode()
+        return res
+
+    def get_stdout(self, cmd, **kwargs):
+        res = self.run(cmd, **kwargs)
+        if hasattr(res, "stdout"):
+            return res.stdout.strip()
+        else:
+            return res

@@ -19,10 +19,10 @@ test_env_path = os.path.expanduser("~/z_local_data/venvs/sarca_test_env/bin/acti
 
 
 # noinspection PyMethodMayBeStatic
-class GeneralTests(TestCase):
+class GeneralTestsRemote(TestCase):
 
     def test_simple_command(self):
-        ce = sarce.ComEx(remote, user)
+        ce = sarce.RemComEx(remote, user)
         res = ce.run("whoami", hide=True)
         self.assertEqual(res.stdout.strip(), user)
 
@@ -30,7 +30,7 @@ class GeneralTests(TestCase):
         self.assertEqual(un, user)
 
     def test_simple_command_err(self):
-        ce = sarce.ComEx(remote, user)
+        ce = sarce.RemComEx(remote, user)
 
         with self.assertRaises(sarce.core.RemoteExecutionError) as cm:
             ce.run("foobarbaz")
@@ -42,7 +42,7 @@ class GeneralTests(TestCase):
             ce.get_stdout("rm foobarbaz")
 
     def test_chdir(self):
-        ce = sarce.ComEx(remote, user)
+        ce = sarce.RemComEx(remote, user)
         res1 = ce.run("ls")
         ce.chdir("tmp")
         res2 = ce.run("ls")
@@ -51,12 +51,12 @@ class GeneralTests(TestCase):
         self.assertEqual(res2.stdout, res3.stdout)
 
     def test_chdir_err(self):
-        ce = sarce.ComEx(remote, user)
+        ce = sarce.RemComEx(remote, user)
         with self.assertRaises(sarce.core.RemoteExecutionError) as cm:
             ce.chdir("foobarbaz")
 
     def test_venv(self):
-        ce = sarce.ComEx(remote, user)
+        ce = sarce.RemComEx(remote, user)
 
         test_env_path_base = test_env_path.replace("/bin/activate", "")
 
@@ -77,6 +77,25 @@ class GeneralTests(TestCase):
         self.assertFalse(test_env_path_base in res3.stdout)
 
     def test_venv_err(self):
-        ce = sarce.ComEx(remote, user)
+        ce = sarce.RemComEx(remote, user)
         with self.assertRaises(sarce.core.RemoteExecutionError) as cm:
             ce.activate_venv("foobarbaz")
+
+class GeneralTestsLocal(TestCase):
+
+    def test_simple_command(self):
+        lce = sarce.LoComEx()
+        res = lce.run("whoami")
+        self.assertEqual(res.stdout.strip(), user)
+
+    def test_simple_command_err(self):
+        lce = sarce.LoComEx()
+
+        with self.assertRaises(sarce.core.LocalExecutionError) as cm:
+            lce.run("foobarbaz")
+
+        with self.assertRaises(sarce.core.LocalExecutionError) as cm:
+            lce.get_stdout("foobarbaz")
+
+        with self.assertRaises(sarce.core.LocalExecutionError) as cm:
+            lce.get_stdout("rm foobarbaz")
